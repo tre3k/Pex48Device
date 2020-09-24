@@ -58,9 +58,13 @@ protected:
     static struct sigaction act, act_old;
 
     /* counter accamulator */
-    static unsigned long counter_accamulate;
+    unsigned long counter_accamulate {0};
+    static unsigned int overflow;
 
     static void sig_handler(int isig);
+
+    void setCounter1(uint16_t value);
+    uint16_t getCounter1(void);
 
     /* low level */
     void writeRegister(unsigned int regID, unsigned int value);
@@ -73,11 +77,10 @@ public:
     void startCounter(void);
     void stopCounter(void);
 
-    void setCounter1(uint16_t value);
-    uint16_t getCounter1(void);
+    unsigned long getCounterValue(void){
+        return (overflow<<16|getCounter1());
+    }
 
-    unsigned long getCounterValue(void){return counter_accamulate;}
-    unsigned long getCurrentCounterValue(void){return counter_accamulate+getCounter1();}
 
     int getErrno(void){return _errno;}
 

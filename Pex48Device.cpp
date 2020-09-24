@@ -5,7 +5,7 @@
 #include "Pex48Device.h"
 
 /* static members */
-unsigned long Pex48Device::counter_accamulate {0};
+unsigned int Pex48Device::overflow {0};
 ixpio_signal_t Pex48Device::sig;
 struct sigaction Pex48Device::act;
 struct sigaction Pex48Device::act_old;
@@ -25,7 +25,7 @@ void Pex48Device::writeRegister(unsigned int regID, unsigned int value){
 }
 
 unsigned int Pex48Device::readRegister(unsigned int regID){
-    if(_errno!=Errors::ERR_OK) return 0xffffffff;
+    if(_errno!=Errors::ERR_OK) return 0xfffffffe;
     ixpio_reg_t reg;
     reg.id = regID;
     reg.value = 0;
@@ -42,9 +42,8 @@ unsigned int Pex48Device::readRegister(unsigned int regID){
 
 /* Interrupt handler */
 void Pex48Device::sig_handler(int isig) {
-    counter_accamulate += 65536;
-
-    std::cout << isig << " Handler!\n";
+    overflow += 1;
+    std::cout << "overflow: " << overflow << "\n";
 }
 
 /* constructor */
@@ -80,6 +79,8 @@ uint16_t Pex48Device::getCounter1() {
 }
 
 void Pex48Device::startCounter() {
+    counter_accamulate = 0;
+    overflow = 0;
     /* set Signal action */
     act.sa_handler = Pex48Device::sig_handler;
     sigemptyset(&act.sa_mask);
@@ -102,12 +103,13 @@ void Pex48Device::startCounter() {
         _errno = Errors::ERR_SIG;
     }
 
-    writeRegister(CW_8254,0x36);               // Binary count Interrupt and terminal count
+    writeRegister(CW_8254,0x36);               // Binary count counter0 mode 3
     setCounter1(0xffff);
 }
 
 void Pex48Device::stopCounter() {
     writeRegister(CW_8254,0x30);
     sigaction(SIGALRM, &act_old, NULL);
-    counter_accamulate += getCounter1();
+    counter_accamulate = (overflow<<16|getCounter1());
+    setCounter1(0xffff);
 }

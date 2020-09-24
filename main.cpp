@@ -21,19 +21,16 @@ int main() {
         return 0;
     }
 
-
     pex48->startCounter();
 
-    while(enter!="q"){
-        std::cin >> enter;
-        std::cout << "Current value: " << pex48->getCurrentCounterValue() << "\n";
+    while(1){
+        std::cout << "Current value: " << pex48->getCounterValue() << "\n";
         sleep(1);
+        if(pex48->getCounterValue()>65535*3) break;
     }
-
 
     pex48->stopCounter();
 
-    std::cout << "counter: " << pex48->getCounter1() << "\n";
     std::cout << "value: " << pex48->getCounterValue() << "\n";
 
     std::cout << "stop counter!\nExiting.\n";
