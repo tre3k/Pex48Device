@@ -20,7 +20,7 @@
 
 class Pex48Device {
 private:
-    int _fd;            // file descriptor for device
+    static int _fd;            // file descriptor for device
     int _errno {0};
 
     /* define const RegID */
@@ -64,7 +64,7 @@ protected:
     static void sig_handler(int isig);
 
     void setCounter1(uint16_t value);
-    uint16_t getCounter1(void);
+
 
     /* low level */
     void writeRegister(unsigned int regID, unsigned int value);
@@ -73,12 +73,13 @@ protected:
 public:
     Pex48Device(std::string path_to_device);
     ~Pex48Device(void);
+    uint16_t getCounter1(void);
 
     void startCounter(void);
     void stopCounter(void);
 
     unsigned long getCounterValue(void){
-        return (overflow<<16|getCounter1());
+        return ((overflow-1)<<16|getCounter1());
     }
 
 

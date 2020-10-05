@@ -14,19 +14,22 @@ int main() {
         return 0;
     }
 
-    //pex48->startCounter();
+    pex48->stopCounter();
+    std::cout << "Current value: " << pex48->getCounterValue() << "\n";
+    sleep(1);
+    std::cout << "Start\n";
+    pex48->startCounter();
     if(pex48->getErrno()!=0){
         std::cout << "Start error!\n";
         delete pex48;
         return 0;
     }
 
-    pex48->startCounter();
-
     while(1){
         std::cout << "Current value: " << pex48->getCounterValue() << "\n";
+        //std::cout << "Counter1: " << pex48->getCounter1() << "\n";
         sleep(1);
-        if(pex48->getCounterValue()>65535*3) break;
+        //if(pex48->getCounterValue()>65535*3) break;
     }
 
     pex48->stopCounter();
